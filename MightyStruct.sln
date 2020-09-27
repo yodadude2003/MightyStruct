@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29920.165
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MightyStruct.App", "MightyStruct.App\MightyStruct.App.csproj", "{8DC429EC-3A71-4BD9-BF66-664212C10BF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MightyStruct", "MightyStruct\MightyStruct.csproj", "{F386D58C-8FE9-4763-8604-D22CB129EDAA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8DC429EC-3A71-4BD9-BF66-664212C10BF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DC429EC-3A71-4BD9-BF66-664212C10BF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DC429EC-3A71-4BD9-BF66-664212C10BF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DC429EC-3A71-4BD9-BF66-664212C10BF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F386D58C-8FE9-4763-8604-D22CB129EDAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F386D58C-8FE9-4763-8604-D22CB129EDAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F386D58C-8FE9-4763-8604-D22CB129EDAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F386D58C-8FE9-4763-8604-D22CB129EDAA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7583978E-0E7A-4762-91FD-A2DEED2DB7EE}
+	EndGlobalSection
+EndGlobal
