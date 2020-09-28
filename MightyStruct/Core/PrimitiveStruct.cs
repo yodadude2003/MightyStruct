@@ -4,8 +4,12 @@ using System.Threading.Tasks;
 
 namespace MightyStruct.Core
 {
-    public class PrimitiveStruct<T> : IStruct
-        where T : struct
+    public interface IPrimitiveStruct : IStruct
+    {
+        object Value { get; set; }
+    }
+
+    public class PrimitiveStruct<T> : IPrimitiveStruct
     {
         public IType Type { get; }
 
@@ -14,12 +18,18 @@ namespace MightyStruct.Core
 
         public Stream Stream { get; }
 
-        public T? Value { get; set; }
+        public T Value { get; set; }
 
-        public PrimitiveStruct(IStruct parent, Stream stream)
+        object IPrimitiveStruct.Value { get => Value; set => Value = (T)value; }
+
+        public PrimitiveStruct(IType type, IStruct parent, Stream stream)
         {
+            Type = type;
+
             Parent = parent;
             Root = Parent?.Root;
+
+            Stream = stream;
         }
 
         public async Task ParseAsync()
@@ -29,10 +39,7 @@ namespace MightyStruct.Core
 
         public Task UpdateAsync()
         {
-            if (Value.HasValue)
-                return (Type as PrimitiveType<T>).Serializer.WriteToStreamAsync(Stream, Value.Value);
-            else
-                return Task.FromException(new InvalidOperationException());
+            return (Type as PrimitiveType<T>).Serializer.WriteToStreamAsync(Stream, Value);
         }
     }
 }

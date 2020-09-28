@@ -1,7 +1,6 @@
 ﻿using MightyStruct.Core;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,7 +33,13 @@ namespace MightyStruct.Serializers
                 chars = Encoding.GetChars(buffer);
             }
 
-            str.AddRange(chars.TakeWhile(c => c != '\u0000'));
+            char[] leftover = chars
+                .TakeWhile(c => c != '\u0000')
+                .ToArray();
+
+            stream.Seek((leftover.Length + 1) - buffer.Length, SeekOrigin.Current);
+
+            str.AddRange(leftover);
 
             return new string(str.ToArray());
         }

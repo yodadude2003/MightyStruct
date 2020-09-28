@@ -2,13 +2,7 @@
 
 namespace MightyStruct.Core
 {
-    public interface IPrimitiveType : IType
-    {
-        IStruct CreateInstance(IStruct parent, Stream stream);
-    }
-
-    public class PrimitiveType<T> : IPrimitiveType
-        where T : struct
+    public class PrimitiveType<T> : IType
     {
         public string Name { get; }
 
@@ -22,7 +16,7 @@ namespace MightyStruct.Core
 
         public IStruct CreateInstance(IStruct parent, Stream stream)
         {
-            return new PrimitiveStruct<T>(parent, stream);
+            return new PrimitiveStruct<T>(this, parent, stream);
         }
     }
 }

@@ -40,11 +40,11 @@ namespace MightyStruct.Core
 
         public override int Read(byte[] buffer, int offset, int count)
         {
+            Seek(0, SeekOrigin.Current);
+            int bytesRead = Parent.Read(buffer, offset, count);
             if ((_position += count) > Length)
                 SetLength(_position);
-
-            Seek(0, SeekOrigin.Current);
-            return Parent.Read(buffer, offset, count);
+            return bytesRead;
         }
 
         public override void Write(byte[] buffer, int offset, int count)

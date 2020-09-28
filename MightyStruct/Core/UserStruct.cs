@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace MightyStruct.Core
 {
-    public class UserStruct : IStruct
+    public class UserStruct : DynamicObject, IStruct
     {
         public IType Type { get; }
 
@@ -21,7 +21,9 @@ namespace MightyStruct.Core
             Type = type;
 
             Parent = parent;
-            Root = Parent?.Root;
+            Root = Parent?.Root ?? this;
+
+            Stream = stream;
 
             Attributes = new Dictionary<string, IStruct>();
         }
@@ -33,16 +35,7 @@ namespace MightyStruct.Core
                 var name = attr.Key;
                 var type = attr.Value;
 
-                IStruct @struct;
-                if (type is IPrimitiveType)
-                {
-                    @struct = (type as IPrimitiveType).CreateInstance(this, new SubStream(Stream, Stream.Position));
-                }
-                else
-                {
-                    @struct = new UserStruct(type, this, new SubStream(Stream, Stream.Position));
-                }
-
+                IStruct @struct = type.CreateInstance(this, new SubStream(Stream, Stream.Position));
                 await @struct.ParseAsync();
 
                 Attributes.Add(name, @struct);
@@ -55,6 +48,45 @@ namespace MightyStruct.Core
             {
                 var @struct = attr.Value;
                 await @struct.UpdateAsync();
+            }
+        }
+
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            if (Attributes.ContainsKey(binder.Name))
+            {
+                var @struct = Attributes[binder.Name];
+                if (@struct is IPrimitiveStruct)
+                    result = (@struct as IPrimitiveStruct).Value;
+                else
+                    result = @struct;
+                return true;
+            }
+            else
+            {
+                result = null;
+                return false;
+            }
+        }
+
+        public override bool TrySetMember(SetMemberBinder binder, object value)
+        {
+            if (Attributes.ContainsKey(binder.Name))
+            {
+                var @struct = Attributes[binder.Name];
+                if (@struct is IPrimitiveStruct)
+                {
+                    (@struct as IPrimitiveStruct).Value = value;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
     }
