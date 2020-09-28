@@ -1,22 +1,23 @@
 ﻿using MightyStruct.Core;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace MightyStruct.Serializers
 {
     public class UInt16Serializer : ISerializer<ushort>
     {
-        public ushort ReadFromStream(Stream stream)
+        public async Task<ushort> ReadFromStreamAsync(Stream stream)
         {
             byte[] buffer = new byte[2];
-            stream.Read(buffer, 0, buffer.Length);
+            await stream.ReadAsync(buffer, 0, buffer.Length);
             return BitConverter.ToUInt16(buffer, 0);
         }
 
-        public void WriteToStream(Stream stream, ushort value)
+        public async Task WriteToStreamAsync(Stream stream, ushort value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
-            stream.Write(buffer, 0, buffer.Length);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
         }
     }
 }

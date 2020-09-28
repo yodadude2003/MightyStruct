@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MightyStruct.Serializers
 {
@@ -17,23 +18,31 @@ namespace MightyStruct.Serializers
             Encoding = encoding;
         }
 
-        public string ReadFromStream(Stream stream)
+        public async Task<string> ReadFromStreamAsync(Stream stream)
         {
-            List<byte> str = new List<byte>();
+            byte[] buffer = new byte[16];
+            List<char> str = new List<char>();
 
-            int ch;
-            while ((ch = stream.ReadByte()) > 0)
+            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+            char[] chars = Encoding.GetChars(buffer);
+
+            while (bytesRead > 0 && !chars.Contains('\u0000'))
             {
-                str.Add((byte)ch);
+                str.AddRange(chars);
+
+                bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                chars = Encoding.GetChars(buffer);
             }
 
-            return Encoding.GetString(str.ToArray());
+            str.AddRange(chars.TakeWhile(c => c != '\u0000'));
+
+            return new string(str.ToArray());
         }
 
-        public void WriteToStream(Stream stream, string value)
+        public async Task WriteToStreamAsync(Stream stream, string value)
         {
             List<byte> buffer = Encoding.GetBytes(value).ToList(); buffer.Add(0);
-            stream.Write(buffer.ToArray(), 0, buffer.Count);
+            await stream.WriteAsync(buffer.ToArray(), 0, buffer.Count);
         }
     }
 }

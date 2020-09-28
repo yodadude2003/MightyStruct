@@ -1,21 +1,22 @@
 ﻿using MightyStruct.Core;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace MightyStruct.Serializers
 {
     public class UInt8Serializer : ISerializer<byte>
     {
-        public byte ReadFromStream(Stream stream)
+        public async Task<byte> ReadFromStreamAsync(Stream stream)
         {
             byte[] buffer = new byte[1];
-            stream.Read(buffer, 0, buffer.Length);
+            await stream.ReadAsync(buffer, 0, buffer.Length);
             return buffer[0];
         }
 
-        public void WriteToStream(Stream stream, byte value)
+        public async Task WriteToStreamAsync(Stream stream, byte value)
         {
             byte[] buffer = new byte[1] { value };
-            stream.Write(buffer, 0, buffer.Length);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
         }
     }
 }

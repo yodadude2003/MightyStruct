@@ -1,14 +1,15 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace MightyStruct.Core
 {
-    public abstract class SubStream : Stream
+    public class SubStream : Stream
     {
         public Stream Parent { get; }
 
         public long Offset { get; }
-        public override long Length { get; }
+
+        public override long Length { get => _length; }
+        private long _length;
 
         public override long Position
         {
@@ -24,12 +25,10 @@ namespace MightyStruct.Core
         }
         private long _position;
 
-        public SubStream(Stream parent, long offset, long length)
+        public SubStream(Stream parent, long offset)
         {
             Parent = parent;
-
             Offset = offset;
-            Length = length;
         }
 
         public override bool CanRead => Parent.CanRead;
@@ -41,16 +40,17 @@ namespace MightyStruct.Core
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            Seek(0, SeekOrigin.Current);
+            if ((_position += count) > Length)
+                SetLength(_position);
 
-            long toRead = (Position + count > Length) ? Length - Position : count;
-            return Parent.Read(buffer, offset, (int)toRead);
+            Seek(0, SeekOrigin.Current);
+            return Parent.Read(buffer, offset, count);
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if (Position + count > Length)
-                throw new ArgumentOutOfRangeException("The requested write operation exceeds the the boundaries of the substream.");
+            if ((_position += count) > Length)
+                SetLength(_position);
 
             Seek(0, SeekOrigin.Current);
             Parent.Write(buffer, offset, count);
@@ -71,6 +71,16 @@ namespace MightyStruct.Core
                     break;
             }
             return Position;
+        }
+
+        public override void SetLength(long value)
+        {
+            _length = value;
+        }
+
+        public override void Flush()
+        {
+            return;
         }
     }
 }
