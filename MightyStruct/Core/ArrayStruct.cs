@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using MightyStruct.Abstractions;
+using System.Collections.Generic;
 using System.Dynamic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace MightyStruct.Core
@@ -8,41 +8,62 @@ namespace MightyStruct.Core
     public class ArrayStruct : DynamicObject, IStruct
     {
         public IType Type { get; }
-        public ArrayType ArrayType { get; }
 
-        public IStruct Parent { get; }
-        public IStruct Root { get; }
-
-        public Stream Stream { get; }
+        public Context Context { get; }
 
         public List<IStruct> Items { get; }
 
-        public ArrayStruct(IType type, IStruct parent, Stream stream)
+        public ArrayStruct(IType type, Context context)
         {
             Type = type;
-            ArrayType = Type as ArrayType;
 
-            Parent = parent;
-            Root = Parent?.Root;
-
-            Stream = stream;
+            Context = new Context(context, this);
 
             Items = new List<IStruct>();
         }
 
         public async Task ParseAsync()
         {
-            int index = 0;
-            IStruct prevStruct = null;
-
-            while (ArrayType.Condition(index, prevStruct))
+            if (Type is DefiniteArrayType)
             {
-                IStruct @struct = ArrayType.BaseType.CreateInstance(this, new SubStream(Stream, Stream.Position));
-                await @struct.ParseAsync();
-                Items.Add(@struct);
+                var type = Type as DefiniteArrayType;
 
-                prevStruct = @struct;
-                index++;
+                var baseType = type.BaseType.Resolve(Context);
+                int length = type.Length.Resolve(Context);
+
+                for (int i = 0; i < length; i++)
+                {
+                    IStruct @struct = baseType.CreateInstance(Context);
+                    await @struct.ParseAsync();
+                    Items.Add(@struct);
+                }
+            }
+            else if(Type is IndefiniteArrayType)
+            {
+                var type = Type as IndefiniteArrayType;
+
+                int index = 0;
+
+                IStruct @struct = type.BaseType.Resolve(Context).CreateInstance(Context);
+                await @struct.ParseAsync();
+
+                var context = new Context(Context);
+
+                context.Variables.Add("_index", index);
+                context.Variables.Add("_", @struct);
+
+
+                var baseType = type.BaseType.Resolve(Context);
+                while (type.Condition.Resolve(context))
+                {
+                    @struct = baseType.CreateInstance(Context);
+                    await @struct.ParseAsync();
+
+                    index++;
+
+                    context.Variables["_index"] = index;
+                    context.Variables["_"] = @struct;
+                }
             }
         }
 

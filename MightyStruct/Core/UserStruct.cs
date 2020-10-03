@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MightyStruct.Abstractions;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Threading.Tasks;
@@ -9,21 +10,19 @@ namespace MightyStruct.Core
     {
         public IType Type { get; }
 
-        public IStruct Parent { get; }
-        public IStruct Root { get; }
+        public Context Context { get; }
 
-        public Stream Stream { get; }
+        // Script variables
+        public IStruct _parent => Context.Parent;
+        public Stream _io => Context.Stream;
 
         public Dictionary<string, IStruct> Attributes { get; }
 
-        public UserStruct(IType type, IStruct parent, Stream stream)
+        public UserStruct(IType type, Context context)
         {
             Type = type;
 
-            Parent = parent;
-            Root = Parent?.Root ?? this;
-
-            Stream = stream;
+            Context = new Context(context, this);
 
             Attributes = new Dictionary<string, IStruct>();
         }
@@ -35,7 +34,9 @@ namespace MightyStruct.Core
                 var name = attr.Key;
                 var type = attr.Value;
 
-                IStruct @struct = type.CreateInstance(this, new SubStream(Stream, Stream.Position));
+                var evaluatedType = type.Resolve(Context);
+
+                IStruct @struct = evaluatedType.CreateInstance(Context);
                 await @struct.ParseAsync();
 
                 Attributes.Add(name, @struct);

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Abstractions
 {
     public interface ISerializer<T>
     {

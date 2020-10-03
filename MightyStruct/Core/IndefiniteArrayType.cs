@@ -2,15 +2,15 @@
 
 namespace MightyStruct.Core
 {
-    public class DefiniteArrayType : IType
+    public class IndefiniteArrayType : IType
     {
         public IPotential<IType> BaseType { get; }
-        public IPotential<int> Length { get; }
+        public IPotential<bool> Condition { get; }
 
-        public DefiniteArrayType(IPotential<IType> baseType, IPotential<int> length)
+        public IndefiniteArrayType(IPotential<IType> baseType, IPotential<bool> condition)
         {
             BaseType = baseType;
-            Length = length;
+            Condition = condition;
         }
 
         public IStruct CreateInstance(Context context)

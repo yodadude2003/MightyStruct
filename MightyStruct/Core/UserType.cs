@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using MightyStruct.Abstractions;
+using System.Collections.Generic;
 
 namespace MightyStruct.Core
 {
@@ -7,17 +7,18 @@ namespace MightyStruct.Core
     {
         public string Name { get; }
 
-        public Dictionary<string, IType> Attributes { get; }
+        public Dictionary<string, IPotential<IType>> Attributes { get; }
 
-        public UserType(string name, Dictionary<string, IType> attrs)
+        public UserType(string name)
         {
             Name = name;
-            Attributes = attrs;
+
+            Attributes = new Dictionary<string, IPotential<IType>>();
         }
 
-        public IStruct CreateInstance(IStruct parent, Stream stream)
+        public IStruct CreateInstance(Context context)
         {
-            return new UserStruct(this, parent, stream);
+            return new UserStruct(this, context);
         }
     }
 }

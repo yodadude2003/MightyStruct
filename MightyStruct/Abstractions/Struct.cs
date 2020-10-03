@@ -1,16 +1,13 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Abstractions
 {
     public interface IStruct
     {
         IType Type { get; }
 
-        IStruct Root { get; }
-        IStruct Parent { get; }
-
-        Stream Stream { get; }
+        Context Context { get; }
 
 
         Task ParseAsync();

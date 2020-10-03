@@ -1,4 +1,4 @@
-﻿using System;
+﻿using MightyStruct.Abstractions;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -13,33 +13,28 @@ namespace MightyStruct.Core
     {
         public IType Type { get; }
 
-        public IStruct Parent { get; }
-        public IStruct Root { get; }
-
-        public Stream Stream { get; }
+        public Context Context { get; }
 
         public T Value { get; set; }
 
         object IPrimitiveStruct.Value { get => Value; set => Value = (T)value; }
 
-        public PrimitiveStruct(IType type, IStruct parent, Stream stream)
+        public PrimitiveStruct(IType type, Context context)
         {
             Type = type;
 
-            Parent = parent;
-            Root = Parent?.Root;
-
-            Stream = stream;
+            Context = new Context(context, this);
         }
 
         public async Task ParseAsync()
         {
-            Value = await (Type as PrimitiveType<T>).Serializer.ReadFromStreamAsync(Stream);
+            Value = await (Type as PrimitiveType<T>).Serializer.ReadFromStreamAsync(Context.Stream);
         }
 
         public Task UpdateAsync()
         {
-            return (Type as PrimitiveType<T>).Serializer.WriteToStreamAsync(Stream, Value);
+            Context.Stream.Seek(0, SeekOrigin.Begin);
+            return (Type as PrimitiveType<T>).Serializer.WriteToStreamAsync(Context.Stream, Value);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using MightyStruct.Core;
+﻿using MightyStruct.Abstractions;
 using System;
 using System.IO;
 using System.Threading.Tasks;

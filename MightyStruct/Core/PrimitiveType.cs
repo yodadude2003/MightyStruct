@@ -1,22 +1,19 @@
-﻿using System.IO;
+﻿using MightyStruct.Abstractions;
 
 namespace MightyStruct.Core
 {
     public class PrimitiveType<T> : IType
     {
-        public string Name { get; }
-
         public ISerializer<T> Serializer { get; }
 
-        public PrimitiveType(string name, ISerializer<T> serializer)
+        public PrimitiveType(ISerializer<T> serializer)
         {
-            Name = name;
             Serializer = serializer;
         }
 
-        public IStruct CreateInstance(IStruct parent, Stream stream)
+        public IStruct CreateInstance(Context context)
         {
-            return new PrimitiveStruct<T>(this, parent, stream);
+            return new PrimitiveStruct<T>(this, context);
         }
     }
 }

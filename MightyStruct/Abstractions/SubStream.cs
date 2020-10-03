@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Abstractions
 {
     public class SubStream : Stream
     {
@@ -49,11 +49,10 @@ namespace MightyStruct.Core
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if ((_position += count) > Length)
-                SetLength(_position);
-
             Seek(0, SeekOrigin.Current);
             Parent.Write(buffer, offset, count);
+            if ((_position += count) > Length)
+                SetLength(_position);
         }
 
         public override long Seek(long offset, SeekOrigin origin)
