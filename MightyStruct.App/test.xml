@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<type name="string_array">
+  <type name="numbered_string">
+    <attr name="num">
+      <type>"u1"</type>
+    </attr>
+    <attr name="str">
+      <type>"str"</type>
+    </attr>
+  </type>
+  <attr name="arr">
+    <type>"numbered_string"</type>
+    <repeat>until</repeat>
+    <repeat-until>
+      ((long)_self._io.Position) >= ((long)_self._io.Length)
+    </repeat-until>
+  </attr>
+</type>

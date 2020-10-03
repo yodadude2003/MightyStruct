@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MightyStruct.App", "MightyStruct.App\MightyStruct.App.csproj", "{8DC429EC-3A71-4BD9-BF66-664212C10BF9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MightyStruct", "MightyStruct\MightyStruct.csproj", "{F386D58C-8FE9-4763-8604-D22CB129EDAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MightyStruct", "MightyStruct\MightyStruct.csproj", "{F386D58C-8FE9-4763-8604-D22CB129EDAA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamicExpresso.Core", "DynamicExpresso\src\DynamicExpresso.Core\DynamicExpresso.Core.csproj", "{85B75472-B7E3-4A1D-A9A4-06E9E81BF7B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F386D58C-8FE9-4763-8604-D22CB129EDAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F386D58C-8FE9-4763-8604-D22CB129EDAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F386D58C-8FE9-4763-8604-D22CB129EDAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85B75472-B7E3-4A1D-A9A4-06E9E81BF7B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85B75472-B7E3-4A1D-A9A4-06E9E81BF7B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85B75472-B7E3-4A1D-A9A4-06E9E81BF7B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85B75472-B7E3-4A1D-A9A4-06E9E81BF7B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

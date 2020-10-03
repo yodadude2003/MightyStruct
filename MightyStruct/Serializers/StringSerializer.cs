@@ -36,7 +36,11 @@ namespace MightyStruct.Serializers
                 .TakeWhile(c => c != '\u0000')
                 .ToArray();
 
-            stream.Seek((leftover.Length + 1) - buffer.Length, SeekOrigin.Current);
+            if (bytesRead > leftover.Length + 1)
+            {
+                stream.Seek((leftover.Length + 1) - buffer.Length, SeekOrigin.Current);
+                stream.SetLength(stream.Position);
+            }
 
             str.AddRange(leftover);
 

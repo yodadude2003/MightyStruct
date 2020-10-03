@@ -1,11 +1,12 @@
 ﻿using MightyStruct.Abstractions;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
 
 namespace MightyStruct.Core
 {
-    public class ArrayStruct : DynamicObject, IStruct
+    public class ArrayStruct : DynamicObject, IStruct, IEnumerable<IStruct>
     {
         public IType Type { get; }
 
@@ -17,7 +18,7 @@ namespace MightyStruct.Core
         {
             Type = type;
 
-            Context = new Context(context, this);
+            Context = new Context(context);
 
             Items = new List<IStruct>();
         }
@@ -38,32 +39,29 @@ namespace MightyStruct.Core
                     Items.Add(@struct);
                 }
             }
-            else if(Type is IndefiniteArrayType)
+            else if (Type is IndefiniteArrayType)
             {
                 var type = Type as IndefiniteArrayType;
+                var baseType = type.BaseType.Resolve(Context);
 
                 int index = 0;
 
-                IStruct @struct = type.BaseType.Resolve(Context).CreateInstance(Context);
-                await @struct.ParseAsync();
-
                 var context = new Context(Context);
 
-                context.Variables.Add("_index", index);
-                context.Variables.Add("_", @struct);
+                context.Variables.Add("_index", 0);
+                context.Variables.Add("_", null);
 
-
-                var baseType = type.BaseType.Resolve(Context);
-                while (type.Condition.Resolve(context))
+                do
                 {
-                    @struct = baseType.CreateInstance(Context);
+                    IStruct @struct = baseType.CreateInstance(Context);
                     await @struct.ParseAsync();
+                    Items.Add(@struct);
 
                     index++;
 
                     context.Variables["_index"] = index;
                     context.Variables["_"] = @struct;
-                }
+                } while (!type.Condition.Resolve(context));
             }
         }
 
@@ -72,6 +70,25 @@ namespace MightyStruct.Core
             foreach (var item in Items)
             {
                 await item.UpdateAsync();
+            }
+        }
+
+        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        {
+            if (binder.Name == "_io")
+            {
+                result = Context.Stream;
+                return true;
+            }
+            else if (binder.Name == "_parent")
+            {
+                result = Context.Parent;
+                return true;
+            }
+            else
+            {
+                result = null;
+                return false;
             }
         }
 
@@ -103,6 +120,16 @@ namespace MightyStruct.Core
             {
                 return false;
             }
+        }
+
+        public IEnumerator<IStruct> GetEnumerator()
+        {
+            return ((IEnumerable<IStruct>)Items).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<IStruct>)Items).GetEnumerator();
         }
     }
 }

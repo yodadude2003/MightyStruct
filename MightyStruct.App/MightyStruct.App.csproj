@@ -9,4 +9,13 @@
     <ProjectReference Include="..\MightyStruct\MightyStruct.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="test.bin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="test.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

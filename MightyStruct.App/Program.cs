@@ -1,4 +1,6 @@
-﻿using MightyStruct.Core;
+﻿using MightyStruct.Abstractions;
+using MightyStruct.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,28 +12,18 @@ namespace MightyStruct
 
         static async Task Main(string[] args)
         {
-            var numbered_string = new UserType(
-                "numbered_string",
-                new Dictionary<string, IType>()
-                {
-                    { "num", Types["u1"] },
-                    { "str", Types["str"] }
-                });
-
-            var array = new IndefiniteArrayType("numbered_string[]", numbered_string,
-                (p, i, s) => p.Stream.Position < p.Stream.Length);
-
-            using (var stream = File.Open(args[0], FileMode.Open, FileAccess.ReadWrite))
+            using (var typeStream = File.OpenRead(args[0]))
+            using (var fileStream = File.Open(args[1], FileMode.Open, FileAccess.ReadWrite))
             {
-                var arr = array.CreateInstance(null, stream);
-                await arr.ParseAsync();
+                var type = Parser.ParseFromStream(typeStream);
 
-                dynamic file = arr;
+                dynamic file = type.CreateInstance(new Context(null, null, fileStream));
+                await file.ParseAsync();
 
-                file[0].str = "hello";
-                file[1].num = (byte)0;
-
-                await file.UpdateAsync();
+                foreach (var num_string in file.arr)
+                {
+                    Console.WriteLine($"num: {num_string.num}, str: \"{num_string.str}\"");
+                }
             }
         }
     }

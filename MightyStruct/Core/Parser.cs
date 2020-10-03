@@ -24,12 +24,12 @@ namespace MightyStruct.Core
         {
             var xml = XElement.Load(stream);
 
-            return ParseType(xml, /* TODO: static dictionary of primative types */);
+            return ParseType(xml, Types);
         }
 
         public static UserType ParseType(XElement xmlType, Dictionary<string, IType> scopedTypes)
         {
-            var typeName = xmlType.Element("name");
+            var typeName = xmlType.Attribute("name");
             var type = new UserType(typeName.Value);
 
             var subTypes = xmlType.Elements("type");
@@ -43,7 +43,7 @@ namespace MightyStruct.Core
 
             foreach (var attr in attributes)
             {
-                var attrName = attr.Element("name");
+                var attrName = attr.Attribute("name");
                 var typeExpr = attr.Element("type");
                 var repeatType = attr.Element("repeat");
 
@@ -57,13 +57,13 @@ namespace MightyStruct.Core
                     var lengthExpr = attr.Element("repeat-expr");
                     var untilExpr = attr.Element("repeat-until");
 
-                    if (lengthExpr != null)
+                    if (repeatType.Value == "expr")
                     {
                         var baseType = new NamedTypePotential(scopedTypes, new Expression<string>(typeExpr.Value));
                         var arrayType = new DefiniteArrayType(baseType, new Expression<int>(lengthExpr.Value));
                         typePotential = new TrivialTypePotential(arrayType);
                     }
-                    else if (untilExpr != null)
+                    else if (repeatType.Value == "until")
                     {
                         var baseType = new NamedTypePotential(scopedTypes, new Expression<string>(typeExpr.Value));
                         var arrayType = new IndefiniteArrayType(baseType, new Expression<bool>(untilExpr.Value));

@@ -12,10 +12,6 @@ namespace MightyStruct.Core
 
         public Context Context { get; }
 
-        // Script variables
-        public IStruct _parent => Context.Parent;
-        public Stream _io => Context.Stream;
-
         public Dictionary<string, IStruct> Attributes { get; }
 
         public UserStruct(IType type, Context context)
@@ -54,7 +50,17 @@ namespace MightyStruct.Core
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (Attributes.ContainsKey(binder.Name))
+            if (binder.Name == "_io")
+            {
+                result = Context.Stream;
+                return true;
+            }
+            else if (binder.Name == "_parent")
+            {
+                result = Context.Parent;
+                return true;
+            }
+            else if (Attributes.ContainsKey(binder.Name))
             {
                 var @struct = Attributes[binder.Name];
                 if (@struct is IPrimitiveStruct)

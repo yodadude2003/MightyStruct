@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace MightyStruct.Abstractions
+﻿namespace MightyStruct.Abstractions
 {
     public interface IType
     {
