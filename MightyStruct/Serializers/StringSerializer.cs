@@ -40,6 +40,7 @@ namespace MightyStruct.Serializers
             {
                 stream.Seek((leftover.Length + 1) - buffer.Length, SeekOrigin.Current);
                 stream.SetLength(stream.Position);
+                (stream as SubStream)?.Lock();
             }
 
             str.AddRange(leftover);

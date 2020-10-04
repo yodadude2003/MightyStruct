@@ -8,61 +8,44 @@ namespace MightyStruct.Core
 {
     public class ArrayStruct : DynamicObject, IStruct, IEnumerable<IStruct>
     {
-        public IType Type { get; }
+        private Context Context { get; }
 
-        public Context Context { get; }
+        private IType BaseType { get; }
+        private IPotential<bool> LoopCondition { get; }
 
-        public List<IStruct> Items { get; }
+        private List<IStruct> Items { get; }
 
-        public ArrayStruct(IType type, Context context)
+        public int Length => Items.Count;
+        public int size => Items.Count;
+
+        public ArrayStruct(Context context, IType baseType, IPotential<bool> loopCondition)
         {
-            Type = type;
+            Context = new Context(context, this);
 
-            Context = new Context(context);
+            BaseType = baseType;
+            LoopCondition = loopCondition;
 
             Items = new List<IStruct>();
         }
 
         public async Task ParseAsync()
         {
-            if (Type is DefiniteArrayType)
+            int index = 0;
+
+            var context = new Context(Context);
+            context.Variables = new LoopVariables(Context.Parent, 0, null);
+            do
             {
-                var type = Type as DefiniteArrayType;
+                IStruct @struct = await BaseType.Resolve(context);
+                await @struct.ParseAsync();
+                Items.Add(@struct);
 
-                var baseType = type.BaseType.Resolve(Context);
-                int length = type.Length.Resolve(Context);
+                var vars = new LoopVariables(Context.Parent, ++index, @struct);
+                context.Variables = vars;
 
-                for (int i = 0; i < length; i++)
-                {
-                    IStruct @struct = baseType.CreateInstance(Context);
-                    await @struct.ParseAsync();
-                    Items.Add(@struct);
-                }
-            }
-            else if (Type is IndefiniteArrayType)
-            {
-                var type = Type as IndefiniteArrayType;
-                var baseType = type.BaseType.Resolve(Context);
+            } while (!(await LoopCondition.Resolve(context)));
 
-                int index = 0;
-
-                var context = new Context(Context);
-
-                context.Variables.Add("_index", 0);
-                context.Variables.Add("_", null);
-
-                do
-                {
-                    IStruct @struct = baseType.CreateInstance(Context);
-                    await @struct.ParseAsync();
-                    Items.Add(@struct);
-
-                    index++;
-
-                    context.Variables["_index"] = index;
-                    context.Variables["_"] = @struct;
-                } while (!type.Condition.Resolve(context));
-            }
+            (Context.Stream as SubStream)?.Lock();
         }
 
         public async Task UpdateAsync()
@@ -70,25 +53,6 @@ namespace MightyStruct.Core
             foreach (var item in Items)
             {
                 await item.UpdateAsync();
-            }
-        }
-
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {
-            if (binder.Name == "_io")
-            {
-                result = Context.Stream;
-                return true;
-            }
-            else if (binder.Name == "_parent")
-            {
-                result = Context.Parent;
-                return true;
-            }
-            else
-            {
-                result = null;
-                return false;
             }
         }
 

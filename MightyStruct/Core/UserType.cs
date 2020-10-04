@@ -1,5 +1,6 @@
 ﻿using MightyStruct.Abstractions;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MightyStruct.Core
 {
@@ -16,9 +17,9 @@ namespace MightyStruct.Core
             Attributes = new Dictionary<string, IPotential<IType>>();
         }
 
-        public IStruct CreateInstance(Context context)
+        public Task<IStruct> Resolve(Context context)
         {
-            return new UserStruct(this, context);
+            return Task.FromResult<IStruct>(new UserStruct(this, context));
         }
     }
 }

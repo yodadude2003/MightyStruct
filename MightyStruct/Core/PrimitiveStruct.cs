@@ -11,30 +11,29 @@ namespace MightyStruct.Core
 
     public class PrimitiveStruct<T> : IPrimitiveStruct
     {
-        public IType Type { get; }
+        private ISerializer<T> Serializer { get; }
 
-        public Context Context { get; }
+        private Context Context { get; }
 
         public T Value { get; set; }
 
         object IPrimitiveStruct.Value { get => Value; set => Value = (T)value; }
 
-        public PrimitiveStruct(IType type, Context context)
+        public PrimitiveStruct(Context context, ISerializer<T> serializer)
         {
-            Type = type;
-
             Context = new Context(context, this);
+            Serializer = serializer;
         }
 
         public async Task ParseAsync()
         {
-            Value = await (Type as PrimitiveType<T>).Serializer.ReadFromStreamAsync(Context.Stream);
+            Value = await Serializer.ReadFromStreamAsync(Context.Stream);
         }
 
         public Task UpdateAsync()
         {
             Context.Stream.Seek(0, SeekOrigin.Begin);
-            return (Type as PrimitiveType<T>).Serializer.WriteToStreamAsync(Context.Stream, Value);
+            return Serializer.WriteToStreamAsync(Context.Stream, Value);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MightyStruct.Abstractions;
+using System.Threading.Tasks;
 
 namespace MightyStruct.Core
 {
@@ -11,9 +12,9 @@ namespace MightyStruct.Core
             Serializer = serializer;
         }
 
-        public IStruct CreateInstance(Context context)
+        public Task<IStruct> Resolve(Context context)
         {
-            return new PrimitiveStruct<T>(this, context);
+            return Task.FromResult<IStruct>(new PrimitiveStruct<T>(context, Serializer));
         }
     }
 }

@@ -1,38 +1,41 @@
 ﻿using MightyStruct.Abstractions;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace MightyStruct.Core
 {
     public class UserStruct : DynamicObject, IStruct
     {
-        public IType Type { get; }
+        private UserType Type { get; }
 
-        public Context Context { get; }
+        private Context Context { get; }
 
-        public Dictionary<string, IStruct> Attributes { get; }
+        private Dictionary<string, IStruct> Attributes { get; }
 
-        public UserStruct(IType type, Context context)
+        public SafeStream _io => new SafeStream(Context.Stream);
+        public IStruct _parent => Context.Parent;
+
+        public UserStruct(UserType type, Context context)
         {
             Type = type;
 
             Context = new Context(context, this);
+            Context.Variables = new Variables(Context.Self);
 
             Attributes = new Dictionary<string, IStruct>();
         }
 
         public async Task ParseAsync()
         {
-            foreach (var attr in (Type as UserType).Attributes)
+            foreach (var attr in Type.Attributes)
             {
                 var name = attr.Key;
                 var type = attr.Value;
 
-                var evaluatedType = type.Resolve(Context);
+                var evaluatedType = await type.Resolve(Context);
 
-                IStruct @struct = evaluatedType.CreateInstance(Context);
+                IStruct @struct = await evaluatedType.Resolve(Context);
                 await @struct.ParseAsync();
 
                 Attributes.Add(name, @struct);
@@ -50,21 +53,13 @@ namespace MightyStruct.Core
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            if (binder.Name == "_io")
-            {
-                result = Context.Stream;
-                return true;
-            }
-            else if (binder.Name == "_parent")
-            {
-                result = Context.Parent;
-                return true;
-            }
-            else if (Attributes.ContainsKey(binder.Name))
+            if (Attributes.ContainsKey(binder.Name))
             {
                 var @struct = Attributes[binder.Name];
                 if (@struct is IPrimitiveStruct)
                     result = (@struct as IPrimitiveStruct).Value;
+                else if (@struct is VoidStruct)
+                    result = (@struct as VoidStruct).Stream;
                 else
                     result = @struct;
                 return true;

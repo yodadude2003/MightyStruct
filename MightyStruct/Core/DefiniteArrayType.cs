@@ -1,21 +1,40 @@
 ﻿using MightyStruct.Abstractions;
+using System.Threading.Tasks;
 
 namespace MightyStruct.Core
 {
-    public class DefiniteArrayType : IType
+    public class DefiniteLoopCondition : IPotential<bool>
     {
-        public IPotential<IType> BaseType { get; }
-        public IPotential<int> Length { get; }
+        public int Length { get; }
 
-        public DefiniteArrayType(IPotential<IType> baseType, IPotential<int> length)
+        public DefiniteLoopCondition(int length)
         {
-            BaseType = baseType;
             Length = length;
         }
 
-        public IStruct CreateInstance(Context context)
+        public Task<bool> Resolve(Context context)
         {
-            return new ArrayStruct(this, context);
+            var loopState = context.Variables as LoopVariables;
+            bool shouldStop = loopState._index >= Length;
+            return Task.FromResult(shouldStop);
+        }
+    }
+
+    public class DefiniteArrayType : ArrayType
+    {
+        public IPotential<int> Length { get; }
+
+        public DefiniteArrayType(IPotential<IType> baseType, IPotential<int> length) : base(baseType)
+        {
+            Length = length;
+        }
+
+        public override async Task<IStruct> Resolve(Context context)
+        {
+            IType baseType = await BaseType.Resolve(context);
+            int length = await Length.Resolve(context);
+
+            return new ArrayStruct(context, baseType, new DefiniteLoopCondition(length));
         }
     }
 }

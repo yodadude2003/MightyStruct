@@ -1,5 +1,6 @@
 ﻿using MightyStruct.Abstractions;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MightyStruct.Core
 {
@@ -14,9 +15,9 @@ namespace MightyStruct.Core
             TypeName = typeName;
         }
 
-        public IType Resolve(Context context)
+        public async Task<IType> Resolve(Context context)
         {
-            return Types[TypeName.Resolve(context)];
+            return Types[await TypeName.Resolve(context)];
         }
     }
 }

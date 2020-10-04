@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
 namespace MightyStruct.Abstractions
 {
@@ -10,18 +9,13 @@ namespace MightyStruct.Abstractions
 
         public Stream Stream { get; }
 
-        public Dictionary<string, IType> Types { get; }
-        public Dictionary<string, object> Variables { get; }
+        public long? Offset { get; }
 
-        public Context(IStruct self, IStruct parent, Stream stream)
+        public Variables Variables { get; set; }
+
+        public Context(Stream stream)
         {
-            Self = self;
-            Parent = parent;
-
             Stream = stream;
-
-            Types = new Dictionary<string, IType>();
-            Variables = new Dictionary<string, object>();
         }
 
         public Context(Context context)
@@ -31,19 +25,24 @@ namespace MightyStruct.Abstractions
 
             Stream = context.Stream;
 
-            Types = new Dictionary<string, IType>(context.Types);
-            Variables = new Dictionary<string, object>(context.Variables);
+            Offset = context.Offset;
+
+            Variables = context.Variables;
         }
 
-        public Context(Context context, IStruct newSelf)
+        public Context(Context context, long offset) : this(context)
+        {
+            Offset = offset;
+        }
+
+        public Context(Context parent, IStruct newSelf)
         {
             Self = newSelf;
-            Parent = context.Self;
+            Parent = parent.Self;
 
-            Stream = new SubStream(context.Stream, context.Stream.Position);
+            Stream = new SubStream(parent.Stream, parent.Offset ?? parent.Stream.Position);
 
-            Types = new Dictionary<string, IType>(context.Types);
-            Variables = new Dictionary<string, object>(context.Variables);
+            Variables = parent.Variables;
         }
     }
 }

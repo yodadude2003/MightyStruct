@@ -10,6 +10,7 @@ namespace MightyStruct.Serializers
         {
             byte[] buffer = new byte[1];
             await stream.ReadAsync(buffer, 0, buffer.Length);
+            (stream as SubStream)?.Lock();
             return buffer[0];
         }
 

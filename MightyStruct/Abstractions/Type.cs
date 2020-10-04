@@ -1,7 +1,6 @@
 ﻿namespace MightyStruct.Abstractions
 {
-    public interface IType
+    public interface IType : IPotential<IStruct>
     {
-        IStruct CreateInstance(Context context);
     }
 }

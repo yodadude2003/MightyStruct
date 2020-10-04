@@ -1,28 +1,24 @@
-﻿using DynamicExpresso;
+﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using System.Threading.Tasks;
 
 namespace MightyStruct.Abstractions
 {
     public class Expression<T> : IPotential<T>
     {
-        public string Expr { get; }
+        public Script<T> Script { get; }
 
         public Expression(string expr)
         {
-            Expr = expr;
+            var options = ScriptOptions.Default
+                .WithReferences("Microsoft.CSharp");
+            Script = CSharpScript.Create<T>(expr, options, typeof(Variables));
         }
 
-        public T Resolve(Context context)
+        public async Task<T> Resolve(Context context)
         {
-            var interpreter = new Interpreter();
-
-            interpreter.SetVariable("_self", context.Self);
-
-            foreach (var variable in context.Variables)
-            {
-                interpreter.SetVariable(variable.Key, variable.Value);
-            }
-
-            return interpreter.Eval<T>(Expr);
+            var result = await Script.RunAsync(context.Variables);
+            return result.ReturnValue;
         }
     }
 }

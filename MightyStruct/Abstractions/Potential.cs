@@ -1,7 +1,9 @@
-﻿namespace MightyStruct.Abstractions
+﻿using System.Threading.Tasks;
+
+namespace MightyStruct.Abstractions
 {
     public interface IPotential<T>
     {
-        T Resolve(Context context);
+        Task<T> Resolve(Context context);
     }
 }

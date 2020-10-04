@@ -44,30 +44,54 @@ namespace MightyStruct.Core
             foreach (var attr in attributes)
             {
                 var attrName = attr.Attribute("name");
+
+                var typeAttr = attr.Attribute("type");
                 var typeExpr = attr.Element("type");
+
+                var offsetExpr = attr.Element("offset");
+                var sizeExpr = attr.Element("size");
+
                 var repeatType = attr.Element("repeat");
 
-                IPotential<IType> typePotential = null;
-                if (repeatType == null)
+                IPotential<IType> typePotential;
+
+                if (typeAttr != null || typeExpr != null)
                 {
-                    typePotential = new NamedTypePotential(scopedTypes, new Expression<string>(typeExpr.Value));
+                    IPotential<string> namePotential = typeAttr != null ?
+                        (IPotential<string>)new TrivialPotential<string>(typeAttr.Value) :
+                        (IPotential<string>)new Expression<string>(typeExpr.Value);
+
+                    typePotential = new NamedTypePotential(scopedTypes, namePotential);
                 }
                 else
+                {
+                    typePotential = new TrivialPotential<IType>(new VoidType(new Expression<long>(sizeExpr.Value)));
+                }
+
+                if (offsetExpr != null)
+                {
+                    var baseType = typePotential;
+                    var offsetType = new OffsetType(baseType, new Expression<long>(offsetExpr.Value));
+
+                    typePotential = new TrivialPotential<IType>(offsetType);
+                }
+
+                if (repeatType != null)
                 {
                     var lengthExpr = attr.Element("repeat-expr");
                     var untilExpr = attr.Element("repeat-until");
 
+                    var baseType = typePotential;
+
                     if (repeatType.Value == "expr")
                     {
-                        var baseType = new NamedTypePotential(scopedTypes, new Expression<string>(typeExpr.Value));
                         var arrayType = new DefiniteArrayType(baseType, new Expression<int>(lengthExpr.Value));
-                        typePotential = new TrivialTypePotential(arrayType);
+                        typePotential = new TrivialPotential<IType>(arrayType);
                     }
                     else if (repeatType.Value == "until")
                     {
-                        var baseType = new NamedTypePotential(scopedTypes, new Expression<string>(typeExpr.Value));
                         var arrayType = new IndefiniteArrayType(baseType, new Expression<bool>(untilExpr.Value));
-                        typePotential = new TrivialTypePotential(arrayType);
+                        typePotential = new TrivialPotential<IType>(arrayType);
                     }
                 }
 

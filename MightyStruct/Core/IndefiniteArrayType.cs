@@ -1,21 +1,21 @@
 ﻿using MightyStruct.Abstractions;
+using System.Threading.Tasks;
 
 namespace MightyStruct.Core
 {
-    public class IndefiniteArrayType : IType
+    public class IndefiniteArrayType : ArrayType
     {
-        public IPotential<IType> BaseType { get; }
-        public IPotential<bool> Condition { get; }
+        public IPotential<bool> LoopCondition { get; }
 
-        public IndefiniteArrayType(IPotential<IType> baseType, IPotential<bool> condition)
+        public IndefiniteArrayType(IPotential<IType> baseType, IPotential<bool> condition) : base(baseType)
         {
-            BaseType = baseType;
-            Condition = condition;
+            LoopCondition = condition;
         }
 
-        public IStruct CreateInstance(Context context)
+        public override async Task<IStruct> Resolve(Context context)
         {
-            return new ArrayStruct(this, context);
+            var type = await BaseType.Resolve(context);
+            return new ArrayStruct(context, type, LoopCondition);
         }
     }
 }
