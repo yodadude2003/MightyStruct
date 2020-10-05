@@ -1,8 +1,9 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+
 using System.Threading.Tasks;
 
-namespace MightyStruct.Abstractions
+namespace MightyStruct.Runtime
 {
     public class Expression<T> : IPotential<T>
     {

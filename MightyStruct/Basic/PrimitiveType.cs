@@ -1,7 +1,8 @@
-﻿using MightyStruct.Abstractions;
+﻿using MightyStruct.Runtime;
+
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Basic
 {
     public class PrimitiveType<T> : IType
     {

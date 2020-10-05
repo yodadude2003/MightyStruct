@@ -1,9 +1,10 @@
-﻿using MightyStruct.Abstractions;
+﻿using MightyStruct.Runtime;
+
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Basic
 {
     public class UserStruct : DynamicObject, IStruct
     {

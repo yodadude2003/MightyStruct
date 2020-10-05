@@ -1,6 +1,6 @@
-﻿using MightyStruct.Abstractions;
+﻿using MightyStruct.Runtime;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Arrays
 {
     public class LoopVariables : Variables
     {

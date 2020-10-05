@@ -1,4 +1,4 @@
-﻿namespace MightyStruct.Abstractions
+﻿namespace MightyStruct
 {
     public interface IType : IPotential<IStruct>
     {

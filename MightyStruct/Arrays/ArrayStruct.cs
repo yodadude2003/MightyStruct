@@ -1,10 +1,12 @@
-﻿using MightyStruct.Abstractions;
+﻿using MightyStruct.Basic;
+using MightyStruct.Runtime;
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Arrays
 {
     public class ArrayStruct : DynamicObject, IStruct, IEnumerable<IStruct>
     {
@@ -15,7 +17,6 @@ namespace MightyStruct.Core
 
         private List<IStruct> Items { get; }
 
-        public int Length => Items.Count;
         public int size => Items.Count;
 
         public ArrayStruct(Context context, IType baseType, IPotential<bool> loopCondition)
@@ -63,6 +64,10 @@ namespace MightyStruct.Core
             if (item is IPrimitiveStruct)
             {
                 result = (item as IPrimitiveStruct).Value;
+            }
+            else if (item is VoidStruct)
+            {
+                result = (item as VoidStruct).Stream;
             }
             else
             {

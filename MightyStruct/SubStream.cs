@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace MightyStruct.Abstractions
+namespace MightyStruct
 {
     public class SubStream : Stream
     {

@@ -1,7 +1,10 @@
-﻿using MightyStruct.Abstractions;
+﻿using MightyStruct;
+using MightyStruct;
+using MightyStruct.Runtime;
+
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Basic
 {
     public class OffsetType : IType
     {

@@ -1,8 +1,9 @@
-﻿using MightyStruct.Abstractions;
+﻿using MightyStruct.Runtime;
+
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Basic
 {
     public class UserType : IType
     {

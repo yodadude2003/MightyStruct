@@ -1,7 +1,8 @@
-﻿using MightyStruct.Abstractions;
+﻿using MightyStruct.Runtime;
+
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Arrays
 {
     public class DefiniteLoopCondition : IPotential<bool>
     {

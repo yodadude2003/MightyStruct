@@ -1,5 +1,4 @@
-﻿using MightyStruct.Abstractions;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 
 namespace MightyStruct.Serializers

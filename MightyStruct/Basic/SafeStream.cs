@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Basic
 {
     public class SafeStream
     {

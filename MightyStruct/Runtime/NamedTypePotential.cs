@@ -1,8 +1,7 @@
-﻿using MightyStruct.Abstractions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Runtime
 {
     public class NamedTypePotential : IPotential<IType>
     {

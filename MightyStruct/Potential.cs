@@ -1,8 +1,14 @@
-﻿using MightyStruct.Abstractions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct
 {
+    using Runtime;
+
+    public interface IPotential<T>
+    {
+        Task<T> Resolve(Context context);
+    }
+
     public class TrivialPotential<T> : IPotential<T>
     {
         public T Inner { get; }

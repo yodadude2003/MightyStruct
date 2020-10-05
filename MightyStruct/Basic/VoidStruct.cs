@@ -1,12 +1,15 @@
-﻿using MightyStruct.Abstractions;
+﻿using MightyStruct.Runtime;
+
 using System.IO;
 using System.Threading.Tasks;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Basic
 {
     public class VoidStruct : IStruct
     {
         private Context Context { get; }
+        
+        private long Length { get; }
 
         public Stream Stream => Context.Stream;
 
@@ -14,13 +17,16 @@ namespace MightyStruct.Core
         {
             Context = new Context(context, this);
 
-            Context.Stream.SetLength(length);
-            (Context.Stream as SubStream)?.Lock();
+            Length = length;
         }
 
         public Task ParseAsync()
         {
-            Context.Stream.Position = Context.Stream.Length;
+            Context.Stream.SetLength(Length);
+            Context.Stream.Position = Length;
+
+            (Context.Stream as SubStream)?.Lock();
+
             return Task.CompletedTask;
         }
 

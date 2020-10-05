@@ -1,11 +1,13 @@
-﻿using MightyStruct.Abstractions;
+﻿using MightyStruct.Arrays;
+using MightyStruct.Basic;
 using MightyStruct.Serializers;
+
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml.Linq;
 
-namespace MightyStruct.Core
+namespace MightyStruct.Runtime
 {
     public class Parser
     {
@@ -99,11 +101,6 @@ namespace MightyStruct.Core
             }
 
             return type;
-        }
-
-        public IStruct CreateInstance(IStruct parent, Stream stream, Context context)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

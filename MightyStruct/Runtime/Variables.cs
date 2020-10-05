@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MightyStruct.Abstractions
+namespace MightyStruct.Runtime
 {
     public class Variables
     {

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace MightyStruct.Abstractions
+namespace MightyStruct
 {
     public interface IStruct
     {
