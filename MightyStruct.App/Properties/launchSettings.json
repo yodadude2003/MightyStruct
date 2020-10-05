@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "MightyStruct.App": {
-      "commandName": "Project",
-      "commandLineArgs": "test.xml test.bin"
-    }
-  }
-}
