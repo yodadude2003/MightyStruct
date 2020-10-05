@@ -59,6 +59,8 @@ namespace MightyStruct.Basic
 
                 Attributes.Add(name, @struct);
             }
+
+            (Context.Stream as SubStream).Lock();
         }
 
         public async Task UpdateAsync()

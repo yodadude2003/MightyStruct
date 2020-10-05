@@ -47,6 +47,7 @@ namespace MightyStruct.Basic
         public async Task ParseAsync()
         {
             Value = await Serializer.ReadFromStreamAsync(Context.Stream);
+            (Context.Stream as SubStream)?.Lock();
         }
 
         public Task UpdateAsync()

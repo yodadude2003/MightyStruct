@@ -28,7 +28,6 @@ namespace MightyStruct.Serializers
         {
             byte[] buffer = new byte[8];
             await stream.ReadAsync(buffer, 0, buffer.Length);
-            (stream as SubStream)?.Lock();
             return BitConverter.ToUInt64(buffer, 0);
         }
 
