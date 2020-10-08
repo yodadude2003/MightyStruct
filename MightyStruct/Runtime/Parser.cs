@@ -33,9 +33,14 @@ namespace MightyStruct.Runtime
         { get; } = new Dictionary<string, IType>()
         {
             { "u1", new PrimitiveType<byte>(new UInt8Serializer()) },
-            { "u2", new PrimitiveType<ushort>(new UInt16Serializer()) },
-            { "u4", new PrimitiveType<uint>(new UInt32Serializer()) },
-            { "u8", new PrimitiveType<ulong>(new UInt64Serializer()) },
+
+            { "u2le", new PrimitiveType<ushort>(new UInt16Serializer(Endianness.LittleEndian)) },
+            { "u4le", new PrimitiveType<uint>(new UInt32Serializer(Endianness.LittleEndian)) },
+            { "u8le", new PrimitiveType<ulong>(new UInt64Serializer(Endianness.LittleEndian)) },
+
+            { "u2be", new PrimitiveType<ushort>(new UInt16Serializer(Endianness.BigEndian)) },
+            { "u4be", new PrimitiveType<uint>(new UInt32Serializer(Endianness.BigEndian)) },
+            { "u8be", new PrimitiveType<ulong>(new UInt64Serializer(Endianness.BigEndian)) },
 
             { "str", new PrimitiveType<string>(new StringSerializer(Encoding.ASCII)) },
         };

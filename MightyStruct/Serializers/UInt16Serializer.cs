@@ -24,16 +24,31 @@ namespace MightyStruct.Serializers
 {
     public class UInt16Serializer : ISerializer<ushort>
     {
+        public Endianness Endianness { get; }
+
+        public UInt16Serializer(Endianness endianness)
+        {
+            Endianness = endianness;
+        }
+
         public async Task<ushort> ReadFromStreamAsync(Stream stream)
         {
             byte[] buffer = new byte[2];
             await stream.ReadAsync(buffer, 0, buffer.Length);
+
+            if (EndianInfo.SystemEndianness != Endianness)
+                Array.Reverse(buffer);
+
             return BitConverter.ToUInt16(buffer, 0);
         }
 
         public async Task WriteToStreamAsync(Stream stream, ushort value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
+
+            if (EndianInfo.SystemEndianness != Endianness)
+                Array.Reverse(buffer);
+
             await stream.WriteAsync(buffer, 0, buffer.Length);
         }
     }

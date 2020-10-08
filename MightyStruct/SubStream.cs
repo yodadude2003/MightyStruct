@@ -69,17 +69,21 @@ namespace MightyStruct
         {
             Seek(0, SeekOrigin.Current);
             int bytesRead = Parent.Read(buffer, offset, count);
-            if (_position + count > Length)
+            if (_locked)
             {
-                if (_locked)
+                if (_position + count > Length)
                 {
                     bytesRead = (int)(Length - _position);
                     _position = Length;
                 }
                 else
                 {
-                    SetLength(_position += count);
+                    _position += count;
                 }
+            }
+            else
+            {
+                SetLength(_position += count);
             }
             return bytesRead;
         }
@@ -88,16 +92,20 @@ namespace MightyStruct
         {
             Seek(0, SeekOrigin.Current);
             Parent.Write(buffer, offset, count);
-            if (_position + count > Length)
+            if (_locked)
             {
-                if (_locked)
+                if (_position + count > Length)
                 {
                     throw new InvalidOperationException("Attempted to write past the stream's boundaries");
                 }
                 else
                 {
-                    SetLength(_position += count);
+                    _position += count;
                 }
+            }
+            else
+            {
+                SetLength(_position += count);
             }
         }
 
@@ -122,6 +130,8 @@ namespace MightyStruct
         {
             if (_locked)
                 throw new InvalidOperationException("Sub-stream is locked and its length cannot be changed.");
+            if (Offset + value > Parent.Length)
+                Parent.SetLength(Offset + value);
             _length = value;
         }
 
