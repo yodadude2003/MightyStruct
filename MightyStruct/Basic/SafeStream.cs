@@ -24,6 +24,8 @@ namespace MightyStruct.Basic
     {
         private Stream Stream { get; }
 
+        public SafeStream _parent => new SafeStream((Stream as SubStream)?.Parent);
+
         public long pos => Stream.Position;
         public long size => Stream.Length;
 
