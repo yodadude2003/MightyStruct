@@ -27,6 +27,8 @@ namespace MightyStruct
 
         public long Offset { get; }
 
+        public long AbsoluteOffset => (Parent is SubStream) ? (Parent as SubStream).AbsoluteOffset + Offset : Offset;
+
         public override long Length { get => _length; }
         private long _length;
         private bool _locked;
