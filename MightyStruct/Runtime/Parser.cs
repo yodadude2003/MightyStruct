@@ -32,17 +32,32 @@ namespace MightyStruct.Runtime
         public static Dictionary<string, IType> Types
         { get; } = new Dictionary<string, IType>()
         {
+            // Unsigned integers (endianness independent)
             { "u1", new PrimitiveType<byte>(new UInt8Serializer()) },
 
+            // Unsigned integers (little endian)
             { "u2le", new PrimitiveType<ushort>(new UInt16Serializer(Endianness.LittleEndian)) },
             { "u4le", new PrimitiveType<uint>(new UInt32Serializer(Endianness.LittleEndian)) },
             { "u8le", new PrimitiveType<ulong>(new UInt64Serializer(Endianness.LittleEndian)) },
 
+            // Unsigned integers (big endian)
             { "u2be", new PrimitiveType<ushort>(new UInt16Serializer(Endianness.BigEndian)) },
             { "u4be", new PrimitiveType<uint>(new UInt32Serializer(Endianness.BigEndian)) },
             { "u8be", new PrimitiveType<ulong>(new UInt64Serializer(Endianness.BigEndian)) },
 
-            { "str", new PrimitiveType<string>(new StringSerializer(Encoding.ASCII)) },
+            // Signed integers (both endians | TODO: Implement s2, s8)
+            { "s4le", new PrimitiveType<int>(new SInt32Serializer(Endianness.LittleEndian)) },
+            { "s4be", new PrimitiveType<int>(new SInt32Serializer(Endianness.BigEndian)) },
+
+            // Floating point types (both endians | TODO: Implement f2, f8)
+            { "f4le", new PrimitiveType<float>(new Float32Serializer(Endianness.LittleEndian)) },
+            { "f4be", new PrimitiveType<float>(new Float32Serializer(Endianness.BigEndian)) },
+
+            // String types (null terminating)
+            { "str_ascii", new PrimitiveType<string>(new StringSerializer(Encoding.ASCII)) },
+            { "str_utf8", new PrimitiveType<string>(new StringSerializer(Encoding.UTF8)) },
+            { "str_uni", new PrimitiveType<string>(new StringSerializer(Encoding.Unicode)) },
+            { "str_uni_be", new PrimitiveType<string>(new StringSerializer(Encoding.BigEndianUnicode)) },
         };
 
         public static UserType ParseFromStream(Stream stream)
@@ -62,7 +77,7 @@ namespace MightyStruct.Runtime
 
             foreach (var subType in subTypes)
             {
-                var parsed = ParseType(subType, scopedTypes);
+                var parsed = ParseType(subType, new Dictionary<string, IType>(scopedTypes));
                 scopedTypes.Add(parsed.Name, parsed);
             }
 
@@ -75,6 +90,8 @@ namespace MightyStruct.Runtime
 
                 var offsetExpr = attr.Element("offset");
                 var sizeExpr = attr.Element("size");
+
+                var conditionExpr = attr.Element("if");
 
                 var repeatType = attr.Element("repeat");
 
@@ -99,6 +116,14 @@ namespace MightyStruct.Runtime
                     var offsetType = new OffsetType(baseType, new Expression<long>(offsetExpr.Value));
 
                     typePotential = new TrivialPotential<IType>(offsetType);
+                }
+
+                if (conditionExpr != null)
+                {
+                    var baseType = typePotential;
+                    var conditionalType = new ConditionalType(baseType, new Expression<bool>(conditionExpr.Value));
+
+                    typePotential = new TrivialPotential<IType>(conditionalType);
                 }
 
                 if (repeatType != null)

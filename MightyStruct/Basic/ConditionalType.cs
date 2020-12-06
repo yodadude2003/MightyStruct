@@ -22,18 +22,26 @@ using System.Threading.Tasks;
 
 namespace MightyStruct.Basic
 {
-    public class PrimitiveType<T> : IType
+    public class ConditionalType : IType
     {
-        public ISerializer<T> Serializer { get; }
+        public IPotential<IType> BaseType { get; }
+        public IPotential<bool> Condition { get; }
 
-        public PrimitiveType(ISerializer<T> serializer)
+        public ConditionalType(IPotential<IType> baseType, IPotential<bool> condition)
         {
-            Serializer = serializer;
+            BaseType = baseType;
+            Condition = condition;
         }
 
-        public Task<IStruct> Resolve(Context context)
+        public async Task<IStruct> Resolve(Context context)
         {
-            return Task.FromResult<IStruct>(new PrimitiveStruct<T>(context, this));
+            var type = await BaseType.Resolve(context);
+            var condition = await Condition.Resolve(context);
+
+            if (condition)
+                return await type.Resolve(context);
+            else
+                return null;
         }
     }
 }

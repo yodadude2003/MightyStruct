@@ -58,7 +58,10 @@ namespace MightyStruct.Runtime
             Self = newSelf;
             Parent = parent.Self;
 
-            Stream = new SubStream(parent.Stream, parent.Offset ?? parent.Stream.Position);
+            if (parent.Offset.HasValue)
+                Stream = new SubStream((parent.Stream as SubStream)?.Root ?? parent.Stream, parent.Offset.Value);
+            else
+                Stream = new SubStream(parent.Stream, parent.Stream.Position);
 
             Variables = parent.Variables;
         }

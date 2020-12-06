@@ -17,7 +17,6 @@
  */
 
 using MightyStruct.Runtime;
-
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
@@ -55,7 +54,7 @@ namespace MightyStruct.Basic
                 var evaluatedType = await type.Resolve(Context);
 
                 IStruct @struct = await evaluatedType.Resolve(Context);
-                await @struct.ParseAsync();
+                if (@struct != null) await @struct.ParseAsync();
 
                 Attributes.Add(name, @struct);
             }

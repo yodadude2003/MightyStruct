@@ -39,7 +39,7 @@ namespace MightyStruct.Arrays
 
         public ArrayStruct(Context context, IType baseType, IPotential<bool> loopCondition)
         {
-            Context = new Context(context, this);
+            Context = new Context(context);
 
             BaseType = baseType;
             LoopCondition = loopCondition;
@@ -52,19 +52,18 @@ namespace MightyStruct.Arrays
             int index = 0;
 
             var context = new Context(Context);
-            context.Variables = new LoopVariables(Context.Parent, 0, null);
+            context.Variables = new LoopVariables(Context.Self, 0, null);
             do
             {
                 IStruct @struct = await BaseType.Resolve(context);
-                await @struct.ParseAsync();
+                if (@struct != null)
+                    await @struct.ParseAsync();
                 Items.Add(@struct);
 
-                var vars = new LoopVariables(Context.Parent, ++index, @struct);
+                var vars = new LoopVariables(Context.Self, ++index, @struct);
                 context.Variables = vars;
 
             } while (!(await LoopCondition.Resolve(context)));
-
-            (Context.Stream as SubStream)?.Lock();
         }
 
         public async Task UpdateAsync()

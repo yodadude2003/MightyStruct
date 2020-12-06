@@ -30,7 +30,7 @@ namespace MightyStruct.Basic
 
     public class PrimitiveStruct<T> : IPrimitiveStruct
     {
-        private ISerializer<T> Serializer { get; }
+        private PrimitiveType<T> Type { get; }
 
         private Context Context { get; }
 
@@ -38,22 +38,22 @@ namespace MightyStruct.Basic
 
         object IPrimitiveStruct.Value { get => Value; set => Value = (T)value; }
 
-        public PrimitiveStruct(Context context, ISerializer<T> serializer)
+        public PrimitiveStruct(Context context, PrimitiveType<T> type)
         {
             Context = new Context(context, this);
-            Serializer = serializer;
+            Type = type;
         }
 
         public async Task ParseAsync()
         {
-            Value = await Serializer.ReadFromStreamAsync(Context.Stream);
+            Value = await Type.Serializer.ReadFromStreamAsync(Context.Stream);
             (Context.Stream as SubStream)?.Lock();
         }
 
         public Task UpdateAsync()
         {
             Context.Stream.Seek(0, SeekOrigin.Begin);
-            return Serializer.WriteToStreamAsync(Context.Stream, Value);
+            return Type.Serializer.WriteToStreamAsync(Context.Stream, Value);
         }
     }
 }
