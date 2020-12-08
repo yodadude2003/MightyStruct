@@ -75,6 +75,7 @@ namespace MightyStruct.Runtime
             var subTypes = xmlType.Elements("type");
             var attributes = xmlType.Elements("attr");
 
+            scopedTypes.Add(type.Name, type);
             foreach (var subType in subTypes)
             {
                 var parsed = ParseType(subType, new Dictionary<string, IType>(scopedTypes));
