@@ -30,12 +30,10 @@ namespace MightyStruct.Basic
 
     public class PrimitiveStruct<T> : IPrimitiveStruct
     {
-        private PrimitiveType<T> Type { get; }
-
-        private Context Context { get; }
+        public Context Context { get; }
+        public PrimitiveType<T> Type { get; }
 
         public T Value { get; set; }
-
         object IPrimitiveStruct.Value { get => Value; set => Value = (T)value; }
 
         public PrimitiveStruct(Context context, PrimitiveType<T> type)

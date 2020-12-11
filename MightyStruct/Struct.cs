@@ -16,12 +16,14 @@
  *  along with MightyStruct.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using MightyStruct.Runtime;
 using System.Threading.Tasks;
 
 namespace MightyStruct
 {
     public interface IStruct
     {
+        Context Context { get; } 
         Task ParseAsync();
         Task UpdateAsync();
     }
