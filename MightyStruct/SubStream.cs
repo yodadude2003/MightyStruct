@@ -70,23 +70,21 @@ namespace MightyStruct
 
         public override int Read(byte[] buffer, int offset, int count)
         {
+            int bytesRead;
             Seek(0, SeekOrigin.Current);
-            int bytesRead = Parent.Read(buffer, offset, count);
             if (_locked)
             {
                 if (_position + count > Length)
-                {
-                    bytesRead = (int)(Length - _position);
-                    _position = Length;
-                }
+                    bytesRead = Parent.Read(buffer, offset, (int)(Length - _position));
                 else
-                {
-                    _position += count;
-                }
+                    bytesRead = Parent.Read(buffer, offset, count);
+
+                _position += bytesRead;
             }
             else
             {
-                SetLength(_position += count);
+                bytesRead = Parent.Read(buffer, offset, count);
+                SetLength(_position += bytesRead);
             }
             return bytesRead;
         }

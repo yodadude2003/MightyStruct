@@ -28,12 +28,12 @@ namespace MightyStruct.Arrays
 {
     public class ArrayStruct : DynamicObject, IStruct, IEnumerable<IStruct>
     {
-        private Context Context { get; }
+        public Context Context { get; }
 
-        private IType BaseType { get; }
-        private IPotential<bool> LoopCondition { get; }
+        public IType BaseType { get; }
+        public IPotential<bool> LoopCondition { get; }
 
-        private List<IStruct> Items { get; }
+        public List<IStruct> Items { get; }
 
         public int size => Items.Count;
 
@@ -70,7 +70,10 @@ namespace MightyStruct.Arrays
         {
             foreach (var item in Items)
             {
-                await item.UpdateAsync();
+                if (item != null)
+                {
+                    await item.UpdateAsync();
+                }
             }
         }
 

@@ -25,9 +25,8 @@ namespace MightyStruct.Basic
 {
     public class VoidStruct : IStruct
     {
-        private Context Context { get; }
-        
-        private long Length { get; }
+        public Context Context { get; }
+        public long Length { get; }
 
         public Stream Stream => Context.Stream;
 

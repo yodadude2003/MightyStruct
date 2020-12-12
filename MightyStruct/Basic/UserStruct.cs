@@ -25,11 +25,10 @@ namespace MightyStruct.Basic
 {
     public class UserStruct : DynamicObject, IStruct
     {
-        private UserType Type { get; }
+        public Context Context { get; }
 
-        private Context Context { get; }
-
-        private Dictionary<string, IStruct> Attributes { get; }
+        public UserType Type { get; }
+        public Dictionary<string, IStruct> Attributes { get; }
 
         public SafeStream _io => new SafeStream(Context.Stream);
         public IStruct _parent => Context.Parent;
@@ -67,7 +66,11 @@ namespace MightyStruct.Basic
             foreach (var attr in Attributes)
             {
                 var @struct = attr.Value;
-                await @struct.UpdateAsync();
+
+                if (@struct != null)
+                {
+                    await @struct.UpdateAsync();
+                }
             }
         }
 
