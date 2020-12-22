@@ -23,7 +23,8 @@ namespace MightyStruct
 {
     public interface IStruct
     {
-        Context Context { get; } 
+        Context Context { get; }
+
         Task ParseAsync();
         Task UpdateAsync();
     }

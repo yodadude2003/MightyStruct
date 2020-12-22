@@ -89,7 +89,10 @@ namespace MightyStruct.Runtime
                 var typeAttr = attr.Attribute("type");
                 var typeExpr = attr.Element("type");
 
+                var baseExpr = attr.Element("base");
+                var pointerExpr = attr.Element("pointer");
                 var offsetExpr = attr.Element("offset");
+
                 var sizeExpr = attr.Element("size");
 
                 var conditionExpr = attr.Element("if");
@@ -111,10 +114,14 @@ namespace MightyStruct.Runtime
                     typePotential = new TrivialPotential<IType>(new VoidType(new Expression<long>(sizeExpr.Value)));
                 }
 
-                if (offsetExpr != null)
+                if (pointerExpr != null)
                 {
                     var baseType = typePotential;
-                    var offsetType = new OffsetType(baseType, new Expression<long>(offsetExpr.Value));
+                    var offsetType = new OffsetType(baseType, 
+                        new Expression<IPrimitiveStruct>(pointerExpr.Value),
+                        baseExpr == null ? new TrivialPotential<IStruct>(null) : new Expression<IStruct>(baseExpr.Value),
+                        offsetExpr == null ? new TrivialPotential<long>(0) : new Expression<long>(offsetExpr.Value)
+                        );
 
                     typePotential = new TrivialPotential<IType>(offsetType);
                 }

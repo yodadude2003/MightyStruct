@@ -18,7 +18,6 @@
 
 using MightyStruct.Basic;
 using MightyStruct.Runtime;
-
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -30,10 +29,10 @@ namespace MightyStruct.Arrays
     {
         public Context Context { get; }
 
-        public IType BaseType { get; }
-        public IPotential<bool> LoopCondition { get; }
+        private IType BaseType { get; }
+        private IPotential<bool> LoopCondition { get; }
 
-        public List<IStruct> Items { get; }
+        private List<IStruct> Items { get; }
 
         public int size => Items.Count;
 
@@ -81,18 +80,8 @@ namespace MightyStruct.Arrays
         {
             int idx = (int)indexes[0];
             var item = Items[idx];
-            if (item is IPrimitiveStruct)
-            {
-                result = (item as IPrimitiveStruct).Value;
-            }
-            else if (item is VoidStruct)
-            {
-                result = (item as VoidStruct).Stream;
-            }
-            else
-            {
-                result = item;
-            }
+            result = item;
+
             return true;
         }
 

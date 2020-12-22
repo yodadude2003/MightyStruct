@@ -17,7 +17,6 @@
  */
 
 using MightyStruct.Runtime;
-
 using System.Threading.Tasks;
 
 namespace MightyStruct.Basic
@@ -25,20 +24,31 @@ namespace MightyStruct.Basic
     public class OffsetType : IType
     {
         public IPotential<IType> BaseType { get; }
+
+        public IPotential<IPrimitiveStruct> PointerValue { get; }
+        public IPotential<IStruct> PointerBase { get; }
         public IPotential<long> Offset { get; }
 
-        public OffsetType(IPotential<IType> baseType, IPotential<long> offset)
+        public OffsetType(IPotential<IType> baseType, IPotential<IPrimitiveStruct> pointerValue, IPotential<IStruct> pointerBase, IPotential<long> offset)
         {
             BaseType = baseType;
+
+            PointerBase = pointerBase;
+            PointerValue = pointerValue;
+
             Offset = offset;
         }
 
         public async Task<IStruct> Resolve(Context context)
         {
             var type = await BaseType.Resolve(context);
+
+            var @base = await PointerBase.Resolve(context);
+            var value = await PointerValue.Resolve(context);
+
             var offset = await Offset.Resolve(context);
 
-            return await type.Resolve(new Context(context, offset));
+            return await type.Resolve(new Context(context, new Pointer(value, @base?.Context.Segment, offset)));
         }
     }
 }

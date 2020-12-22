@@ -16,21 +16,29 @@
  *  along with MightyStruct.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System;
+using MightyStruct.Basic;
+using System.Threading.Tasks;
 
-namespace MightyStruct.Serializers
+namespace MightyStruct.Runtime
 {
-    public enum Endianness
+    public class Pointer
     {
-        LittleEndian = 0,
-        BigEndian = 1
-    }
+        public IPrimitiveStruct Inner { get; }
+        public Segment Base { get; }
+        public long Offset { get; }
 
-    public static class EndianInfo
-    {
-        public static readonly Endianness SystemEndianness = 
-            BitConverter.IsLittleEndian ? 
-            Endianness.LittleEndian : 
-            Endianness.BigEndian;
+        public Pointer(IPrimitiveStruct inner, Segment @base, long offset)
+        {
+            Inner = inner;
+            Base = @base;
+
+            Offset = offset;
+        }
+
+        public Task AddAsync(short amount)
+        {
+            Inner.Value += amount;
+            return Inner.UpdateAsync();
+        }
     }
 }

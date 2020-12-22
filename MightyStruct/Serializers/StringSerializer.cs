@@ -55,7 +55,7 @@ namespace MightyStruct.Serializers
 
             if (bytesRead > leftover.Length + 1)
             {
-                stream.Seek((leftover.Length + 1) - buffer.Length, SeekOrigin.Current);
+                stream.Seek((leftover.Length + 1) - bytesRead, SeekOrigin.Current);
                 stream.SetLength(stream.Position);
             }
 

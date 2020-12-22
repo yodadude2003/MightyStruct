@@ -25,16 +25,16 @@ namespace MightyStruct.Basic
 {
     public interface IPrimitiveStruct : IStruct
     {
-        object Value { get; set; }
+        dynamic Value { get; set; }
     }
 
     public class PrimitiveStruct<T> : IPrimitiveStruct
     {
         public Context Context { get; }
-        public PrimitiveType<T> Type { get; }
+        private PrimitiveType<T> Type { get; }
 
         public T Value { get; set; }
-        object IPrimitiveStruct.Value { get => Value; set => Value = (T)value; }
+        dynamic IPrimitiveStruct.Value { get => Value; set => Value = (T)value; }
 
         public PrimitiveStruct(Context context, PrimitiveType<T> type)
         {
@@ -45,13 +45,19 @@ namespace MightyStruct.Basic
         public async Task ParseAsync()
         {
             Value = await Type.Serializer.ReadFromStreamAsync(Context.Stream);
-            (Context.Stream as SubStream)?.Lock();
+            (Context.Stream as SubStream).Lock();
         }
 
-        public Task UpdateAsync()
+        public async Task UpdateAsync()
         {
             Context.Stream.Seek(0, SeekOrigin.Begin);
-            return Type.Serializer.WriteToStreamAsync(Context.Stream, Value);
+            await Type.Serializer.WriteToStreamAsync(Context.Stream, Value);
+            await Context.Stream.FlushAsync();
+        }
+
+        public static implicit operator T(PrimitiveStruct<T> primitive) 
+        {
+            return primitive.Value;
         }
     }
 }

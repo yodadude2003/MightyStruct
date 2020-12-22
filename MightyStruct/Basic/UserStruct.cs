@@ -17,6 +17,7 @@
  */
 
 using MightyStruct.Runtime;
+
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
@@ -27,8 +28,8 @@ namespace MightyStruct.Basic
     {
         public Context Context { get; }
 
-        public UserType Type { get; }
-        public Dictionary<string, IStruct> Attributes { get; }
+        private UserType Type { get; }
+        private Dictionary<string, IStruct> Attributes { get; }
 
         public SafeStream _io => new SafeStream(Context.Stream);
         public IStruct _parent => Context.Parent;
@@ -79,12 +80,7 @@ namespace MightyStruct.Basic
             if (Attributes.ContainsKey(binder.Name))
             {
                 var @struct = Attributes[binder.Name];
-                if (@struct is IPrimitiveStruct)
-                    result = (@struct as IPrimitiveStruct).Value;
-                else if (@struct is VoidStruct)
-                    result = (@struct as VoidStruct).Stream;
-                else
-                    result = @struct;
+                result = @struct;
                 return true;
             }
             else

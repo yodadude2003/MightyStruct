@@ -17,8 +17,6 @@
  */
 
 using MightyStruct.Runtime;
-
-using System.IO;
 using System.Threading.Tasks;
 
 namespace MightyStruct.Basic
@@ -26,9 +24,8 @@ namespace MightyStruct.Basic
     public class VoidStruct : IStruct
     {
         public Context Context { get; }
-        public long Length { get; }
 
-        public Stream Stream => Context.Stream;
+        private long Length { get; }
 
         public VoidStruct(Context context, long length)
         {
@@ -42,7 +39,7 @@ namespace MightyStruct.Basic
             Context.Stream.SetLength(Length);
             Context.Stream.Position = Length;
 
-            (Context.Stream as SubStream)?.Lock();
+            (Context.Stream as SubStream).Lock();
 
             return Task.CompletedTask;
         }

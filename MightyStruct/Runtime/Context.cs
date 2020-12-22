@@ -25,15 +25,16 @@ namespace MightyStruct.Runtime
         public IStruct Self { get; }
         public IStruct Parent { get; }
 
-        public Stream Stream { get; }
+        public Segment Segment { get; }
+        public Stream Stream => Segment.Stream;
 
-        public long? Offset { get; }
+        public Pointer Pointer { get; }
 
         public Variables Variables { get; set; }
 
-        public Context(Stream stream)
+        public Context(Segment segment)
         {
-            Stream = stream;
+            Segment = segment;
         }
 
         public Context(Context context)
@@ -41,16 +42,15 @@ namespace MightyStruct.Runtime
             Self = context.Self;
             Parent = context.Parent;
 
-            Stream = context.Stream;
-
-            Offset = context.Offset;
+            Pointer = context.Pointer;
+            Segment = context.Segment;
 
             Variables = context.Variables;
         }
 
-        public Context(Context context, long offset) : this(context)
+        public Context(Context context, Pointer pointer) : this(context)
         {
-            Offset = offset;
+            Pointer = pointer;
         }
 
         public Context(Context parent, IStruct newSelf)
@@ -58,10 +58,16 @@ namespace MightyStruct.Runtime
             Self = newSelf;
             Parent = parent.Self;
 
-            if (parent.Offset.HasValue)
-                Stream = new SubStream((parent.Stream as SubStream)?.Root ?? parent.Stream, parent.Offset.Value);
+            if (parent.Pointer != null)
+            {
+                long offset = ((parent.Pointer.Base?.Stream as SubStream)?.AbsoluteOffset ?? 0) + parent.Pointer.Inner.Value + parent.Pointer.Offset;
+                Segment = new Segment(parent.Segment.Root, offset);
+                Segment.Pointers.Add(parent.Pointer);
+            }
             else
-                Stream = new SubStream(parent.Stream, parent.Stream.Position);
+            {
+                Segment = new Segment(parent.Segment, parent.Stream.Position);
+            }
 
             Variables = parent.Variables;
         }
