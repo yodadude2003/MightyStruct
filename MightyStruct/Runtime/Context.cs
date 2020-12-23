@@ -61,6 +61,7 @@ namespace MightyStruct.Runtime
             if (parent.Pointer != null)
             {
                 long offset = ((parent.Pointer.Base?.Stream as SubStream)?.AbsoluteOffset ?? 0) + parent.Pointer.Inner.Value + parent.Pointer.Offset;
+
                 Segment = new Segment(parent.Segment.Root, offset);
                 Segment.Pointers.Add(parent.Pointer);
             }
