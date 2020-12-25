@@ -45,7 +45,7 @@ namespace MightyStruct.Runtime
             }
         }
 
-        public List<Pointer> Pointers { get; }
+        public Pointer Pointer { get; }
         public List<Segment> SubSegments { get; }
 
         public Stream Stream { get; private set; }
@@ -54,56 +54,74 @@ namespace MightyStruct.Runtime
         {
             Stream = stream;
             SubSegments = new List<Segment>();
-            Pointers = new List<Pointer>();
+            Pointer = null;
         }
 
-        public Segment(Segment parent, long offset)
+        public Segment(Segment parent, Pointer pointer = null)
         {
             Parent = parent;
+            Pointer = pointer;
+
+            if (Pointer == null)
+            {
+                Parent = parent;
+                Stream = new SubStream(Parent.Stream, Parent.Stream.Position);
+            }
+            else
+            {
+                Parent = Root;
+
+                long offset = ((Pointer.Base?.Stream as SubStream)?.AbsoluteOffset ?? 0) + Pointer.Inner.Value + Pointer.Offset;
+                Stream = new SubStream(Root.Stream, offset);
+            }
+
             Parent?.SubSegments.Add(this);
-
-            Stream = new SubStream(Parent.Stream, offset);
-
-            Pointers = new List<Pointer>();
             SubSegments = new List<Segment>();
         }
 
-        public async Task OffsetAllAfterAsync(short offset)
+        public List<Segment> GetAllSegments()
         {
-            if (Parent == null) return;
-
-            var segments = Parent.SubSegments
+            return SubSegments
+                .SelectMany(s => s.GetAllSegments())
+                .Concat(SubSegments)
                 .OrderBy(s => (s.Stream as SubStream).AbsoluteOffset)
-                .SkipWhile(s => s != this).Skip(1);
-
-            foreach (var segment in segments)
-            {
-                var subStream = new SubStream(Parent.Stream, (segment.Stream as SubStream).Offset + offset);
-                subStream.SetLength(Stream.Length);
-                subStream.Lock();
-                segment.Stream = subStream;
-            }
-
-            await Parent.OffsetAllAfterAsync(offset);
+                .ToList();
         }
 
-        public async Task UpdateAllPointersAfterAsync(short offset)
+        public async Task UpdatePointersAsync(Segment resized, short offset)
         {
-            if (Parent == null) return;
-
-            var segments = Parent.SubSegments
-                .OrderBy(s => (s.Stream as SubStream).AbsoluteOffset)
-                .SkipWhile(s => s != this).Skip(1);
-
-            foreach (var segment in segments)
+            foreach (var segment in GetAllSegments().SkipWhile(s => s != resized).Skip(1))
             {
-                foreach (var pointer in segment.Pointers)
+                if (resized.Ancestors.Contains(segment.Parent))
                 {
-                    await pointer.AddAsync(offset);
+                    var subStream = new SubStream(segment.Parent.Stream, (segment.Stream as SubStream).Offset + offset);
+                    subStream.SetLength(segment.Stream.Length);
+                    subStream.Lock();
+
+                    segment.Stream = subStream;
+
+                    if (segment.Pointer != null && (segment.Pointer.Base == null || segment.Pointer.Base == resized.Pointer.Base))
+                        await segment.Pointer.AddAsync(offset);
                 }
             }
+        }
 
-            await Parent.UpdateAllPointersAfterAsync(offset);
+        public async Task RebaseAsync(Stream newStream)
+        {
+            if (Stream is SubStream)
+            {
+                var subStream = new SubStream(newStream, (Stream as SubStream).Offset);
+                subStream.SetLength(Stream.Length);
+                subStream.Lock();
+                Stream = subStream;
+            }
+            else
+                Stream = newStream;
+
+            foreach (var segment in SubSegments)
+            {
+                await segment.RebaseAsync(Stream);
+            }
         }
 
         public async Task ResizeAsync(long newSize)
@@ -123,30 +141,15 @@ namespace MightyStruct.Runtime
             short offset = (short)(newSize - Stream.Length);
             newRoot.Seek(offset, SeekOrigin.Current);
 
+            var subStream = new SubStream(Parent.Stream, (Stream as SubStream).Offset);
+            subStream.SetLength(newSize);
+            subStream.Lock();
+            Stream = subStream;
+
             await root.CopyToAsync(newRoot);
 
             await Root.RebaseAsync(newRoot);
-
-            await OffsetAllAfterAsync(offset);
-            await UpdateAllPointersAfterAsync(offset);
-        }
-
-        public async Task RebaseAsync(Stream newStream)
-        {
-            if (Stream is SubStream)
-            {
-                var subStream = new SubStream(newStream, (Stream as SubStream).Offset);
-                subStream.SetLength(Stream.Length);
-                subStream.Lock();
-                Stream = subStream;
-            }
-            else
-                Stream = newStream;
-
-            foreach (var segment in SubSegments)
-            {
-                await segment.RebaseAsync(Stream);
-            }
+            await Root.UpdatePointersAsync(this, offset);
         }
     }
 }

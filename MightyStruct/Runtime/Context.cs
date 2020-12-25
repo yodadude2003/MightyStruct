@@ -58,17 +58,7 @@ namespace MightyStruct.Runtime
             Self = newSelf;
             Parent = parent.Self;
 
-            if (parent.Pointer != null)
-            {
-                long offset = ((parent.Pointer.Base?.Stream as SubStream)?.AbsoluteOffset ?? 0) + parent.Pointer.Inner.Value + parent.Pointer.Offset;
-
-                Segment = new Segment(parent.Segment.Root, offset);
-                Segment.Pointers.Add(parent.Pointer);
-            }
-            else
-            {
-                Segment = new Segment(parent.Segment, parent.Stream.Position);
-            }
+            Segment = new Segment(parent.Segment, parent.Pointer);
 
             Variables = parent.Variables;
         }
