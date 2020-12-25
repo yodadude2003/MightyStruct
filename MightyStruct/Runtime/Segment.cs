@@ -59,7 +59,6 @@ namespace MightyStruct.Runtime
 
         public Segment(Segment parent, Pointer pointer = null)
         {
-            Parent = parent;
             Pointer = pointer;
 
             if (Pointer == null)
@@ -69,10 +68,10 @@ namespace MightyStruct.Runtime
             }
             else
             {
-                Parent = Root;
+                Parent = parent.Root;
 
                 long offset = ((Pointer.Base?.Stream as SubStream)?.AbsoluteOffset ?? 0) + Pointer.Inner.Value + Pointer.Offset;
-                Stream = new SubStream(Root.Stream, offset);
+                Stream = new SubStream(Parent.Stream, offset);
             }
 
             Parent?.SubSegments.Add(this);
