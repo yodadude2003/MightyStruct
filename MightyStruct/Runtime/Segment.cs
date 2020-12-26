@@ -89,7 +89,8 @@ namespace MightyStruct.Runtime
 
         public async Task UpdatePointersAsync(Segment resized, short offset)
         {
-            foreach (var segment in GetAllSegments().SkipWhile(s => s != resized).Skip(1))
+            var segments = GetAllSegments().SkipWhile(s => s != resized).Skip(1);
+            foreach (var segment in segments)
             {
                 if (resized.Ancestors.Contains(segment.Parent))
                 {
@@ -98,7 +99,17 @@ namespace MightyStruct.Runtime
                     subStream.Lock();
 
                     segment.Stream = subStream;
+                    foreach (var subSegment in segment.SubSegments)
+                    {
+                        await subSegment.RebaseAsync(segment.Stream);
+                    }
+                }
+            }
 
+            foreach (var segment in segments)
+            {
+                if (resized.Ancestors.Contains(segment.Parent))
+                {
                     if (segment.Pointer != null && (segment.Pointer.Base == null || segment.Pointer.Base == resized.Pointer.Base))
                         await segment.Pointer.AddAsync(offset);
                 }

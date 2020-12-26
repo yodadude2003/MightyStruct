@@ -17,6 +17,8 @@
  */
 
 using MightyStruct.Runtime;
+
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MightyStruct.Basic
@@ -47,6 +49,11 @@ namespace MightyStruct.Basic
         public Task UpdateAsync()
         {
             return Task.CompletedTask;
+        }
+
+        public static implicit operator Stream(VoidStruct voidStruct)
+        {
+            return voidStruct.Context.Stream;
         }
     }
 }
