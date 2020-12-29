@@ -89,30 +89,27 @@ namespace MightyStruct.Runtime
 
         public async Task UpdatePointersAsync(Segment resized, short offset)
         {
-            var segments = GetAllSegments().SkipWhile(s => s != resized).Skip(1);
+            var segments = GetAllSegments()
+                .SkipWhile(s => s != resized).Skip(1)
+                .Where(s => resized.Ancestors.Contains(s.Parent));
+
             foreach (var segment in segments)
             {
-                if (resized.Ancestors.Contains(segment.Parent))
-                {
-                    var subStream = new SubStream(segment.Parent.Stream, (segment.Stream as SubStream).Offset + offset);
-                    subStream.SetLength(segment.Stream.Length);
-                    subStream.Lock();
+                var subStream = new SubStream(segment.Parent.Stream, (segment.Stream as SubStream).Offset + offset);
+                subStream.SetLength(segment.Stream.Length);
+                subStream.Lock();
 
-                    segment.Stream = subStream;
-                    foreach (var subSegment in segment.SubSegments)
-                    {
-                        await subSegment.RebaseAsync(segment.Stream);
-                    }
+                segment.Stream = subStream;
+                foreach (var subSegment in segment.SubSegments)
+                {
+                    await subSegment.RebaseAsync(segment.Stream);
                 }
             }
 
-            foreach (var segment in segments)
+            foreach (var segment in segments.Where(s => s.Pointer != null))
             {
-                if (resized.Ancestors.Contains(segment.Parent))
-                {
-                    if (segment.Pointer != null && (segment.Pointer.Base == null || segment.Pointer.Base == resized.Pointer.Base))
-                        await segment.Pointer.AddAsync(offset);
-                }
+                if (segment.Pointer.Base == null || segment.Pointer.Base == resized.Pointer.Base)
+                    await segment.Pointer.AddAsync(offset);
             }
         }
 
