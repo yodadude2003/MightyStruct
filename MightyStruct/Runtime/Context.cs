@@ -37,13 +37,17 @@ namespace MightyStruct.Runtime
             Segment = segment;
         }
 
-        public Context(Context context)
+        public Context(Context context, bool newSegment = false)
         {
             Self = context.Self;
             Parent = context.Parent;
 
             Pointer = context.Pointer;
-            Segment = context.Segment;
+
+            if (newSegment)
+                Segment = new Segment(context.Segment, context.Pointer);
+            else
+                Segment = context.Segment;
 
             Variables = context.Variables;
         }

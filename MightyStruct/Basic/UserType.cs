@@ -27,12 +27,14 @@ namespace MightyStruct.Basic
     {
         public string Name { get; }
 
+        public Dictionary<string, UserType> SubTypes { get; }
         public Dictionary<string, IPotential<IType>> Attributes { get; }
 
         public UserType(string name)
         {
             Name = name;
 
+            SubTypes = new Dictionary<string, UserType>();
             Attributes = new Dictionary<string, IPotential<IType>>();
         }
 

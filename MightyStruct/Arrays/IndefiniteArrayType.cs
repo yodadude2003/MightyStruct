@@ -33,8 +33,7 @@ namespace MightyStruct.Arrays
 
         public override async Task<IStruct> Resolve(Context context)
         {
-            var type = await BaseType.Resolve(context);
-            return new ArrayStruct(context, type, LoopCondition);
+            return new ArrayStruct(context, BaseType, LoopCondition);
         }
     }
 }

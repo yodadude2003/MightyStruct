@@ -57,8 +57,14 @@ namespace MightyStruct
         public void Lock()
         {
             if (_locked)
-                throw new InvalidOperationException("Sub-stream is already locked.");
+                throw new InvalidOperationException("Cannot redudantly lock a SubStream is locked.");
             _locked = true;
+        }
+
+        public void Unlock()
+        {
+            (Parent as SubStream)?.Unlock();
+            _locked = false;
         }
 
         public override bool CanRead => Parent.CanRead;
@@ -92,8 +98,8 @@ namespace MightyStruct
         public override void Write(byte[] buffer, int offset, int count)
         {
             Seek(0, SeekOrigin.Current);
-            Parent.Write(buffer, offset, count);
 
+            Parent.Write(buffer, offset, count);
             SetLength(_position += count);
         }
 

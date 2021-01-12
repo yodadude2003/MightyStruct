@@ -20,6 +20,7 @@ using MightyStruct.Runtime;
 
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MightyStruct.Basic
@@ -46,6 +47,10 @@ namespace MightyStruct.Basic
 
         public async Task ParseAsync()
         {
+            Attributes.Clear();
+            Context.Stream.Seek(0, SeekOrigin.Begin);
+            (Context.Stream as SubStream).Unlock();
+
             foreach (var attr in Type.Attributes)
             {
                 var name = attr.Key;

@@ -38,6 +38,9 @@ namespace MightyStruct.Basic
 
         public Task ParseAsync()
         {
+            Context.Stream.Seek(0, SeekOrigin.Begin);
+            (Context.Stream as SubStream).Unlock();
+
             Context.Stream.SetLength(Length);
             Context.Stream.Position = Length;
 

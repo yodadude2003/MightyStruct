@@ -27,7 +27,7 @@ namespace MightyStruct.Runtime
     public class Segment
     {
         public Segment Parent { get; }
-        public Segment Root => Parent?.Parent ?? Parent;
+        public Segment Root => Parent?.Root ?? Parent;
 
         public List<Segment> Ancestors
         {
@@ -90,10 +90,9 @@ namespace MightyStruct.Runtime
         public async Task UpdatePointersAsync(Segment resized, short offset)
         {
             var segments = GetAllSegments()
-                .SkipWhile(s => s != resized).Skip(1)
-                .Where(s => resized.Ancestors.Contains(s.Parent));
+                .SkipWhile(s => s != resized).Skip(1);
 
-            foreach (var segment in segments)
+            foreach (var segment in segments.Where(s => resized.Ancestors.Contains(s.Parent)))
             {
                 var subStream = new SubStream(segment.Parent.Stream, (segment.Stream as SubStream).Offset + offset);
                 subStream.SetLength(segment.Stream.Length);
@@ -108,7 +107,7 @@ namespace MightyStruct.Runtime
 
             foreach (var segment in segments.Where(s => s.Pointer != null))
             {
-                if (segment.Pointer.Base == null || segment.Pointer.Base == resized.Pointer.Base)
+                if (segment.Pointer.Base == null || segment.Pointer.Base == resized.Pointer?.Base)
                     await segment.Pointer.AddAsync(offset);
             }
         }
