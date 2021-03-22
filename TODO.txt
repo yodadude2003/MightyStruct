@@ -1,0 +1,5 @@
+* context based endianess
+* struct properties (calculated fields)
+* runtime attribute naming
+* repeat until end of stream
+* parametized types
