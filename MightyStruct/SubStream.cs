@@ -63,7 +63,6 @@ namespace MightyStruct
 
         public void Unlock()
         {
-            (Parent as SubStream)?.Unlock();
             _locked = false;
         }
 
